@@ -270,6 +270,7 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
         ldapResponse.email = ldapResponse.searchResults[0].email.toLowerCase();
 
         // Look to see if user already exists
+        /*
         var user = Meteor.users.findOne({
             username: ldapResponse.username
         });
@@ -277,6 +278,10 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
             user = Meteor.users.findOne({emails: {$elemMatch: {address: ldapResponse.email, verified: true}}});
             if (user) user.username = ldapResponse.username;
         }
+        */
+        var user = Meteor.users.findOne({
+            _id: ldapResponse.username
+        });
 
         // Login user if they exist
         if (user) {
@@ -313,7 +318,12 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
                 userObject.profile = profileObject;
             }
 
+            /*
             userId = Accounts.createUser(userObject);
+            */
+            userId = Meteor.users.insert({_id: userObject.username,
+                                         username: userObject.username,
+                                         acceptToc: false});
             Meteor.users.update(userId, {
                 $set: {
                     emails: [{
