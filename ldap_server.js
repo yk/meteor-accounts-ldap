@@ -262,12 +262,15 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
         };
     }
     else {
+        console.log(loginRequest);
         // Set initial userId and token vals
         var userId = null;
         var stampedToken = {
             token: null
         };
+        /*
         ldapResponse.email = ldapResponse.searchResults[0].email.toLowerCase();
+        */
 
         // Look to see if user already exists
         /*
@@ -299,7 +302,7 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
             Accounts.setPassword(userId, loginRequest.ldapPass);
         }
         // Otherwise create user if option is set
-        else if (ldapObj.options.createNewUser) {
+        else if (Accounts.ldapObj.options.createNewUser) {
             var userObject = {
                 username: ldapResponse.username
             };
@@ -307,10 +310,10 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
             if (ldapResponse.email) userObject.email = ldapResponse.email;
 
             // Set profile values if specified in searchResultsProfileMap
-            if (ldapResponse.searchResults && ldapObj.options.searchResultsProfileMap.length > 0) {
+            if (ldapResponse.searchResults && Accounts.ldapObj.options.searchResultsProfileMap.length > 0) {
 
                 var profileObject = {};
-                ldapObj.options.searchResultsProfileMap.map(function (item) {
+                Accounts.ldapObj.options.searchResultsProfileMap.map(function (item) {
                     profileObject[item.profileProperty] = ldapResponse.searchResults[0][item.profileProperty];
                 });
 
@@ -324,6 +327,7 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
             userId = Meteor.users.insert({_id: userObject.username,
                                          username: userObject.username,
                                          acceptToc: false});
+            /*
             Meteor.users.update(userId, {
                 $set: {
                     emails: [{
@@ -332,6 +336,7 @@ Accounts.registerLoginHandler('ldap', function (loginRequest) {
                     }]
                 }
             });
+            */
             Accounts.setPassword(userId, loginRequest.ldapPass);
         } else {
             // Ldap success, but no user created
